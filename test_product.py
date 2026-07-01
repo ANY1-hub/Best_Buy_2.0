@@ -30,7 +30,7 @@ class TestProduct:
         """Quantity = 0 is allowed at instantiation"""
         p = Product("Test", price=100, quantity=0)
         assert p.quantity == 0
-        assert p.is_active() is True
+        assert p.is_active() is False
 
     # ==================== Getter / Setter / Active ====================
 

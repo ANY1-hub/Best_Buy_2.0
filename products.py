@@ -15,9 +15,14 @@ class Product():
 
         if quantity < 0:
             raise ValueError("Quantity cannot be negative at creation")
+        elif quantity == 0:
+            self.active = False
+        else:
+            self.active = active
         self.quantity = quantity
 
-        self.active = active
+
+
 
     def get_quantity(self) -> int:
         """
