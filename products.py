@@ -1,6 +1,3 @@
-import store as store_module
-
-
 class Product:
     """ Represents a specific type of product available in the store
         (For example, MacBook Air M2). It encapsulates information about
@@ -23,14 +20,33 @@ class Product:
         else:
             self.active = active
         self.quantity = quantity
+        self.promotion = None
 
-    # TODO @parameter
+    # ------------- getters --------------
+
     def get_quantity(self) -> int:
         """
         Getter function for quantity.
         :return: quantity (int)
         """
         return self.quantity
+
+    def get_promotion(self):
+        """
+        Getter function for promotions
+        :return: promotions
+        """
+        return self.promotion
+
+    def is_active(self) -> bool:
+        """
+        Getter function for active.
+        :return:
+        """
+        return self.active
+
+
+    # ------------- setters --------------
 
     def set_quantity(self, quantity):
         """
@@ -44,12 +60,11 @@ class Product:
             self.activate()
         self.quantity = quantity
 
-    def is_active(self) -> bool:
+    def set_promotion(self, promotion):
         """
-        Getter function for active.
-        :return:
-        """
-        return self.active
+	    sets the promotion of the product
+	    """
+        self.promotion = promotion
 
     def activate(self):
         """
@@ -70,7 +85,9 @@ class Product:
         "MacBook Air M1, Price: 1450, Quantity: 100"
         :return: string representation of a product
         """
-        return (f'{self.name}, Price: {self.price:.2f}, Quantity: {self.quantity}')
+        promotion_name = self.promotion.name if self.promotion else "None"
+        return (f'{self.name}, Price: {self.price:.2f}, '
+                f'Quantity: {self.quantity}, Promotion: {promotion_name}')
 
 
     def buy(self, quantity) -> float:
@@ -85,8 +102,9 @@ class Product:
             raise ValueError('Sorry, you cannot buy negative quantities.')
         if self.quantity - quantity < 0:
             raise ValueError(f'Sorry, we only have {self.quantity} in stock.')
-
         self.set_quantity(self.quantity - quantity)
+        if self.promotion:
+            return float(self.promotion.apply_promotion(self, quantity))
         return float(quantity * self.price)
 
 
@@ -111,7 +129,8 @@ class NonStockedProduct(Product):
         "Windows License, Price: 1450"
         :return: string representation of a product
         """
-        return (f'{self.name}, Price: {self.price:.2f}')
+        promotion_name = self.promotion.name if self.promotion else "None"
+        return (f'{self.name}, Price: {self.price:.2f}, Promotion: {promotion_name}')
 
     def buy(self, quantity) -> float:
         """
@@ -122,6 +141,8 @@ class NonStockedProduct(Product):
         """
         if quantity < 0:
             raise ValueError('Sorry, you cannot buy negative quantities.')
+        if self.promotion:
+            return float(self.promotion.apply_promotion(self, quantity))
         return float(quantity * self.price)
 
 
@@ -157,7 +178,9 @@ class LimitedProduct(Product):
         "Windows License, Price: 1450"
         :return: string representation of a product
         """
-        return (f'{self.name}, Price: {self.price:.2f}, Maximum per Order: {self.maximum}')
+        promo_name = self.promotion.name if self.promotion else "None"
+        return (f'{self.name}, Price: {self.price:.2f}, '
+                f'Maximum per Order: {self.maximum}, Promotion: {promo_name}')
 
     def buy(self, quantity) -> float:
         """
@@ -173,4 +196,6 @@ class LimitedProduct(Product):
         if quantity > self.maximum:
             raise ValueError(f'Sorry, you can order at most {self.maximum} of this product')
         self.set_quantity(self.quantity - quantity)
-        return float(quantity * self.price)
+        if self.promotion:
+            return float(self.promotion.apply_promotion(self, quantity))
+        return float(self.price * quantity)
