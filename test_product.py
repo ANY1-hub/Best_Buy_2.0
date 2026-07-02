@@ -27,7 +27,7 @@ class TestProduct:
             Product("Test", price=100, quantity=-1)
 
     def test_init_zero_quantity_allowed(self):
-        """Quantity = 0 is allowed at instantiation"""
+        """Quantity = 0 is allowed at instantiation but product is inactive"""
         p = Product("Test", price=100, quantity=0)
         assert p.quantity == 0
         assert p.is_active() is False
