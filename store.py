@@ -1,5 +1,5 @@
-from products import Product
-
+# from products import Product
+import products as products_module
 
 class Store():
     """contains one variable - a list of products that exist in the store and facilitates multi product purchase"""
@@ -33,7 +33,7 @@ class Store():
             number_of_products += product.get_quantity()
         return number_of_products
 
-    def get_all_products(self) -> list[Product]:
+    def get_all_products(self) -> list[products_module.Product]:
         """
         Returns all products in the store that are active
         :return: list of ACTIVE products
@@ -45,7 +45,7 @@ class Store():
         return active_products
 
 
-    def order(self, shopping_list: list[tuple[Product, int]]) -> float:
+    def order(self, shopping_list: list[tuple[products_module.Product, int]]) -> float:
         """
         Gets a list of tuples, where each tuple has 2 items:
         Product (Product class) and quantity (int).
@@ -54,6 +54,6 @@ class Store():
         :return: total price of the order
         """
         shopping_list_total_price = 0
-        for product, quantity in shopping_list:
-            shopping_list_total_price += product.buy(quantity)
+        for product_ordered, quantity in shopping_list:
+                shopping_list_total_price += product_ordered.buy(quantity)
         return shopping_list_total_price

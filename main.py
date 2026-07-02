@@ -1,17 +1,16 @@
 from config import colors
-import products
+import products as products_module
 import store as store_module
-from products import Product
 
 # setup initial stock of inventory ===========================================================
-product_list = [ products.Product("MacBook Air M2", price=1450, quantity=100),
-                 products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                 products.Product("Google Pixel 7", price=500, quantity=250)
+product_list = [ products_module.Product("MacBook Air M2", price=1450, quantity=100),
+                 products_module.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+                 products_module.Product("Google Pixel 7", price=500, quantity=250),
+                 products_module.NonStockedProduct("Windows License", price=125),
+                 products_module.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                ]
-best_buy = store_module.Store(product_list)
+best_buy = (store_module.Store(product_list))
 # ============================================================================================
-
-
 
 
 def start(store_instance):
@@ -82,7 +81,28 @@ def get_order_input(store_instance):
 
                 order_quantity = int(input('How many would you like to buy?: '))
                 on_stock = all_products[item_choice].get_quantity()
-                if order_quantity > on_stock:
+
+                # check if product is LimitedProduct for maximum order quantity
+                if isinstance(all_products[item_choice], products_module.LimitedProduct):
+                    maximum = all_products[item_choice].get_maximum()
+                    quantity_in_cart = 0
+                    for cart_product in cart:
+                        if cart_product[0] == all_products[item_choice]:
+                            quantity_in_cart = cart_product[1]
+                    if order_quantity + quantity_in_cart > maximum:
+                        print('Your cart already has the maximum possible number of this product')
+                        continue
+                    if maximum < order_quantity:
+                        if input(f'\nYou can only order {maximum} of this product. '
+                                 f'Would you like that quantity? (y/*): ') in ('y', 'yes'):
+                            order_quantity = maximum
+                        else:
+                            continue
+
+
+
+                # check if order quantity is on stock
+                if order_quantity > on_stock and not isinstance(all_products[item_choice], products_module.NonStockedProduct):
                     print(f'\nSorry we have only {on_stock} pieces on stock.\n')
                     if input('Would you like to buy them? (y/*): ') in ('y','yes'):
                         cart.append((all_products[item_choice],on_stock))
@@ -94,13 +114,13 @@ def get_order_input(store_instance):
                       f"{colors.NORMAL}{colors.RESET}")
                 continue
 
-            if input('\nWant to put another product in your cart? (y/*): ') not in ('y','yes'):
+            if input('\nContinue Shopping? (y/*): ') not in ('y','yes'):
                 break
     if cart:
         process_order(store_instance, cart)
 
 
-def process_order(store_instance, shopping_cart:list[tuple[Product, int]]):
+def process_order(store_instance, shopping_cart:list[tuple[products_module.Product, int]]):
     """processes the order"""
     for shopping_cart_item, qnty in shopping_cart:
         print(f'{shopping_cart_item.name}: quantity: {qnty}, '
@@ -124,3 +144,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
