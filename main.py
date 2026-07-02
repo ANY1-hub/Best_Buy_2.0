@@ -59,6 +59,7 @@ def start(store_instance):
 def list_all_products_in_store(store_instance):
     """lists all products in the store"""
     all_products = store_instance.get_all_products()
+    print()
     for item in all_products:
         print(item.show())
 
@@ -66,7 +67,7 @@ def list_all_products_in_store(store_instance):
 def show_total_items_in_store(store_instance):
     """shows total number of items in store"""
     total_number = store_instance.get_total_quantity()
-    print(f'total number of products : {total_number}')
+    print(f'\nTotal number of products : {colors.CYAN}{total_number}{colors.RESET}')
 
 def get_order_input(store_instance):
     """ gets user input for the order (state machine)
@@ -90,8 +91,10 @@ def get_order_input(store_instance):
                         f"\n{colors.RED}Please enter one of the {colors.BRIGHT} item{colors.NORMAL}s "
                         f"{colors.BRIGHT}number{colors.RESET}\n")
                     continue
-
-                order_quantity = int(input('How many would you like to buy?: '))
+                while True:
+                    order_quantity = int(input(f'How many would you like to buy? {colors.YELLOW}({colors.CYAN}>0{colors.YELLOW}){colors.RESET}: '))
+                    if isinstance(order_quantity, int) and order_quantity > 0:
+                        break
                 on_stock = all_products[item_choice].get_quantity()
 
                 # check if product is LimitedProduct for maximum order quantity
@@ -112,9 +115,11 @@ def get_order_input(store_instance):
                 if order_quantity > on_stock and not isinstance(all_products[item_choice], products_module.NonStockedProduct):
                     print(f'\nSorry we have only {on_stock} pieces on stock.\n')
                     if input('Would you like to buy them? (y/*): ') in ('y','yes'):
-                        cart.append((all_products[item_choice],on_stock))
+                        if order_quantity > 0:
+                            cart.append((all_products[item_choice],on_stock))
                     continue
-                cart.append((all_products[item_choice], order_quantity))
+                if order_quantity > 0:
+                    cart.append((all_products[item_choice], order_quantity))
 
             except ValueError:
                 print(f"\n{colors.YELLOW}Ooops, This was not a valid {colors.BRIGHT}number "
@@ -131,13 +136,13 @@ def process_order(store_instance, shopping_cart:list[tuple[products_module.Produ
     """processes the order"""
     for shopping_cart_item, qnty in shopping_cart:
         if shopping_cart_item.promotion:
-            print(f'{shopping_cart_item.name}:\n\tquantity: {qnty}\n\tdiscount: {shopping_cart_item.promotion.name}\n\t'
-                  f'Product price total: {qnty * shopping_cart_item.price:.2f}EUR\n\t')
+            print(f'{colors.YELLOW}{shopping_cart_item.name}:{colors.RESET}\n\tquantity: {colors.CYAN}{qnty}{colors.RESET}\n\tdiscount: {colors.GREEN}{shopping_cart_item.promotion.name}{colors.RESET}\n\t'
+                  f'Product price total: {colors.CYAN}{qnty * shopping_cart_item.price:.2f}{colors.RESET}EUR\n\t')
                   # f'Discounted product price total: {}')
         else:
-            print(f'{shopping_cart_item.name}: quantity: {qnty}, '
-                  f'price: {qnty * shopping_cart_item.price:.2f}EUR')
-    print(f'Order value total: {store_instance.order(shopping_cart):.2f}EUR')
+            print(f'{colors.YELLOW}{shopping_cart_item.name}:{colors.RESET}\n\tquantity: {colors.CYAN}{qnty}{colors.RESET}\n\t'
+                  f'Product price total: {colors.CYAN}{qnty * shopping_cart_item.price:.2f}{colors.RESET}EUR\n\t')
+    print(f'\n{colors.BRIGHT}{colors.YELLOW}Order value total: {colors.CYAN}{store_instance.order(shopping_cart):.2f}{colors.RESET_ALL}EUR\t')
 
 
 menu_items = [("List all products in store", list_all_products_in_store),

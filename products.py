@@ -1,3 +1,6 @@
+from config import colors
+
+
 class Product:
     """ Represents a specific type of product available in the store
         (For example, MacBook Air M2). It encapsulates information about
@@ -85,10 +88,11 @@ class Product:
         "MacBook Air M1, Price: 1450, Quantity: 100"
         :return: string representation of a product
         """
-        promotion_name = self.promotion.name if self.promotion else "None"
-        return (f'{self.name}, Price: {self.price:.2f}, '
-                f'Quantity: {self.quantity}, Promotion: {promotion_name}')
-
+        if self.promotion:
+            return (f'{colors.YELLOW}{self.name}:{colors.RESET}\n\tPrice: {colors.CYAN}{self.price:.2f}{colors.RESET}, '
+                f'Quantity: {colors.CYAN}{self.quantity}{colors.RESET}\n\tPromotion: {colors.GREEN}{self.promotion.name}{colors.RESET}\n')
+        return (f'{colors.YELLOW}{self.name}:{colors.RESET}\n\tPrice: {colors.CYAN}{self.price:.2f}{colors.RESET}, '
+            f'Quantity: {colors.CYAN}{self.quantity}{colors.RESET}\n')
 
     def buy(self, quantity) -> float:
         """
@@ -129,8 +133,9 @@ class NonStockedProduct(Product):
         "Windows License, Price: 1450"
         :return: string representation of a product
         """
-        promotion_name = self.promotion.name if self.promotion else "None"
-        return (f'{self.name}, Price: {self.price:.2f}, Promotion: {promotion_name}')
+        if self.promotion:
+            return f'{colors.YELLOW}{self.name}:{colors.RESET}\n\tPrice: {colors.CYAN}{self.price:.2f}{colors.RESET}\n\tPromotion: {colors.GREEN}{self.promotion.name}{colors.RESET}\n'
+        return f'{colors.YELLOW}{self.name}:{colors.RESET}\n\tPrice: {colors.CYAN}{self.price:.2f}{colors.RESET}\n'
 
     def buy(self, quantity) -> float:
         """
@@ -178,9 +183,11 @@ class LimitedProduct(Product):
         "Windows License, Price: 1450"
         :return: string representation of a product
         """
-        promo_name = self.promotion.name if self.promotion else "None"
-        return (f'{self.name}, Price: {self.price:.2f}, '
-                f'Maximum per Order: {self.maximum}, Promotion: {promo_name}')
+        if self.promotion:
+            return (f'{colors.YELLOW}{self.name}:{colors.RESET}\n\tPrice: {colors.CYAN}{self.price:.2f}{colors.RESET}, '
+                   f'Maximum per Order: {colors.CYAN}{self.maximum}{colors.RESET}\n\tPromotion: {colors.GREEN}{self.promotion.name}{colors.RESET}')
+        return (f'{colors.YELLOW}{self.name}:{colors.RESET}\n\tPrice: {colors.CYAN}{self.price:.2f}{colors.RESET}, '
+                   f'Maximum per Order: {colors.CYAN}{self.maximum}{colors.RESET}')
 
     def buy(self, quantity) -> float:
         """
