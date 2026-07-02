@@ -88,18 +88,13 @@ def get_order_input(store_instance):
                     quantity_in_cart = 0
                     for cart_product in cart:
                         if cart_product[0] == all_products[item_choice]:
-                            quantity_in_cart = cart_product[1]
+                            quantity_in_cart += cart_product[1]
                     if order_quantity + quantity_in_cart > maximum:
-                        print('Your cart already has the maximum possible number of this product')
-                        continue
-                    if maximum < order_quantity:
                         if input(f'\nYou can only order {maximum} of this product. '
                                  f'Would you like that quantity? (y/*): ') in ('y', 'yes'):
-                            order_quantity = maximum
+                            order_quantity = maximum - quantity_in_cart
                         else:
                             continue
-
-
 
                 # check if order quantity is on stock
                 if order_quantity > on_stock and not isinstance(all_products[item_choice], products_module.NonStockedProduct):
