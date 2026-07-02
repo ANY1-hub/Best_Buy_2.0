@@ -1,5 +1,6 @@
 from config import colors
 import products as products_module
+import promotions as promotions_module
 import store as store_module
 
 # setup initial stock of inventory ===========================================================
@@ -8,7 +9,18 @@ product_list = [ products_module.Product("MacBook Air M2", price=1450, quantity=
                  products_module.Product("Google Pixel 7", price=500, quantity=250),
                  products_module.NonStockedProduct("Windows License", price=125),
                  products_module.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
-               ]
+                 ]
+
+# Create promotion catalog
+second_half_price = promotions_module.SecondHalfPrice("Second Half price!")
+third_one_free = promotions_module.ThirdOneFree("Third One Free!")
+thirty_percent = promotions_module.PercentDiscount("30% off!", percent=30)
+
+# Add promotions to products
+product_list[0].set_promotion(second_half_price)
+product_list[1].set_promotion(third_one_free)
+product_list[3].set_promotion(thirty_percent)
+
 best_buy = (store_module.Store(product_list))
 # ============================================================================================
 
@@ -30,7 +42,7 @@ def start(store_instance):
                     f"\nPlease choose: {colors.YELLOW}({colors.CYAN}1-{len(menu_items)}"
                     f"{colors.YELLOW}){colors.RESET}: ")) - 1
         except ValueError:
-            print(f"\n{colors.YELLOW}Ooops, This was not even a {colors.BRIGHT}number "
+            print(f"\n{colors.YELLOW}Ooops, This was not a {colors.BRIGHT}number "
                   f"{colors.NORMAL}{colors.RESET}")
             continue
         if (len(menu_items) - 1 < menu_choice or menu_choice < 0) and isinstance(menu_choice, int):
@@ -118,8 +130,13 @@ def get_order_input(store_instance):
 def process_order(store_instance, shopping_cart:list[tuple[products_module.Product, int]]):
     """processes the order"""
     for shopping_cart_item, qnty in shopping_cart:
-        print(f'{shopping_cart_item.name}: quantity: {qnty}, '
-              f'preis: {qnty * shopping_cart_item.price:.2f}EUR')
+        if shopping_cart_item.promotion:
+            print(f'{shopping_cart_item.name}:\n\tquantity: {qnty}\n\tdiscount: {shopping_cart_item.promotion.name}\n\t'
+                  f'Product price total: {qnty * shopping_cart_item.price:.2f}EUR\n\t')
+                  # f'Discounted product price total: {}')
+        else:
+            print(f'{shopping_cart_item.name}: quantity: {qnty}, '
+                  f'price: {qnty * shopping_cart_item.price:.2f}EUR')
     print(f'Order value total: {store_instance.order(shopping_cart):.2f}EUR')
 
 
